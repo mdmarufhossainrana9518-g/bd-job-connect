@@ -107,6 +107,23 @@ span.cat{cursor:default}
 .acts{display:flex;gap:8px;margin-top:10px}
 .btn.sm{padding:8px 12px;font-size:14px}
 .btn.danger{color:var(--danger);border-color:var(--danger)}
+.pphoto{flex:none;width:78px;height:98px;border-radius:12px;background:var(--card);border:1.5px dashed var(--line);display:grid;place-items:center;text-align:center;font-size:13px;color:var(--mute);overflow:hidden;cursor:pointer;line-height:1.4}
+.pphoto img,.av img{width:100%;height:100%;object-fit:cover;display:block}
+.av{overflow:hidden;padding:0}
+.pboxes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.pb{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.pb.full{grid-column:1/-1}
+.pb .prow{margin-bottom:8px}
+.arow{display:flex;gap:12px;align-items:flex-start}
+.thumb{width:56px;height:72px;object-fit:cover;border-radius:8px;flex:none}
+.cvdoc{background:#fff;color:#111;border-radius:10px;padding:18px;font-size:15px}
+.cvh{display:flex;gap:14px;align-items:flex-start;border-bottom:2px solid #0c5a46;padding-bottom:12px}
+.cvh img{width:84px;height:108px;object-fit:cover;border-radius:6px}
+.cvh h2{margin:0 0 4px;font-size:24px;color:#0c5a46}
+.cvs h4{margin:14px 0 4px;color:#0c5a46;font-size:16px;border-bottom:1px solid #ddd;padding-bottom:2px}
+.cvs p{margin:2px 0;white-space:pre-wrap;color:#111}
+.cvchips span{display:inline-block;background:#e6f2ee;color:#111;border-radius:99px;padding:2px 10px;margin:2px 4px 2px 0;font-size:14px}
+@media print{body>*:not(#bg){display:none!important}#bg{position:static!important;background:none!important;display:block!important}.sheet{position:static!important;max-height:none!important;overflow:visible!important;background:#fff!important;padding:0!important}.noprint{display:none!important}.cvdoc{border-radius:0;padding:0}}
 </style>
 </head>
 <body>
@@ -242,7 +259,7 @@ function viewApplied(){
   if(isEmp()){
     var h='<h2 class="pt">আবেদনকারী</h2>';
     if(!st.apps.length)return h+'<div class="empty">এখনো কেউ আবেদন করেননি।</div>';
-    return h+st.apps.map(function(a){return '<article class="job"><h3>'+esc(a.name)+'</h3><div class="co">আবেদন: '+esc(a.title)+'</div><div class="co">'+aline(a)+'</div><div class="meta"><a href="tel:'+esc(a.phone)+'">'+esc(a.phone)+'</a><span>'+dt(a)+'</span></div>'+(a.note?'<p>'+esc(a.note)+'</p>':'')+'</article>'}).join("");
+    return h+st.apps.map(function(a,i){return '<article class="job"><div class="arow">'+(a.photo?'<img class="thumb" src="'+a.photo+'" alt="">':'')+'<div><h3>'+esc(a.name)+'</h3><div class="co">আবেদন: '+esc(a.title)+'</div><div class="co">'+aline(a)+'</div><div class="meta"><a href="tel:'+esc(a.phone)+'">'+esc(a.phone)+'</a><span>'+dt(a)+'</span></div></div></div>'+(a.note?'<p>'+esc(a.note)+'</p>':'')+'<div class="acts"><button class="btn alt sm" data-cvapp="'+i+'">সিভি দেখুন</button></div></article>'}).join("");
   }
   var h2='<h2 class="pt">আমার আবেদন</h2>';
   if(!st.apps.length)return h2+'<div class="empty">এখনো কোনো আবেদন করেননি। চাকরি খুঁজে আবেদন করুন।</div>';
@@ -262,7 +279,7 @@ function viewPost(){
   '<div class="err" id="perr"></div><div style="margin-top:14px"><button class="btn" id="dopost">চাকরি পোস্ট করুন</button></div>';
 }
 function dname(){var p=st.profile||{};return (p.name&&p.name.trim())||((st.user&&st.user.email)||"").split("@")[0]||"?"}
-function pct(){var p=st.profile||{},ph=st.user&&st.user.phoneNumber;var f=isEmp()?[p.name,p.company,p.address,p.dist,ph]:[p.name,ph,p.edu,p.exp,p.skills,p.dist,p.salary];var n=f.filter(function(x){return x&&String(x).trim()}).length;return Math.round(n*100/f.length)}
+function pct(){var p=st.profile||{},ph=st.user&&st.user.phoneNumber;var f=isEmp()?[p.name,p.company,p.address,p.dist,ph,p.photo]:[p.name,ph,p.edu,p.exp,p.skills,p.dist,p.salary,p.photo];var n=f.filter(function(x){return x&&String(x).trim()}).length;return Math.round(n*100/f.length)}
 function aline(a){return [a.edu,a.exp,a.skills&&("দক্ষতা: "+a.skills),a.loc,a.salary&&("প্রত্যাশিত বেতন: "+a.salary)].filter(Boolean).map(esc).join(" · ")}
 var EDU=["এসএসসি","এইচএসসি","ডিপ্লোমা","স্নাতক","স্নাতকোত্তর","অন্যান্য"],EXP=["নতুন (অভিজ্ঞতা নেই)","১ বছরের কম","১–৩ বছর","৩–৫ বছর","৫+ বছর"];
 function mineCard(j){
@@ -270,13 +287,30 @@ function mineCard(j){
   return '<article class="job"><h3>'+esc(j.t)+'</h3><div class="co">'+esc(locStr(j))+'</div><div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>আবেদন: '+bn(n)+'</span>'+(j.closed?'<span class="badge">বন্ধ</span>':'')+'</div>'+
   '<div class="acts"><button class="btn alt sm" data-toggle="'+esc(j.id)+'">'+(j.closed?"আবার চালু করুন":"বন্ধ করুন")+'</button><button class="btn alt sm danger" data-del="'+esc(j.id)+'">মুছে ফেলুন</button></div></article>';
 }
+function cvPct(){var p=st.profile||{},f=[p.photo,st.user&&st.user.phoneNumber,p.edu,p.exp,p.skills,p.about,p.work,p.dist];return Math.round(f.filter(function(x){return x&&String(x).trim()}).length*100/f.length)}
+function cvData(){var p=st.profile||{};return {name:dname(),phone:st.user.phoneNumber||"",email:st.user.email,addr:[p.dist,p.div?p.div+" বিভাগ":""].filter(Boolean).join(", "),photo:p.photo,about:p.about,edu:p.edu,edudet:p.edudet,exp:p.exp,work:p.work,skills:p.skills,salary:p.salary}}
+function appCV(a){return {name:a.name,phone:a.phone,email:a.email,addr:a.loc,photo:a.photo,about:a.about,edu:a.edu,edudet:a.edudet,exp:a.exp,work:a.work,skills:a.skills,salary:a.salary}}
+function cvHTML(d){
+  var S=function(t,b){return b?'<div class="cvs"><h4>'+t+'</h4>'+b+'</div>':''};
+  var ch=(d.skills||"").split(/[,،]/).map(function(x){return x.trim()}).filter(Boolean);
+  var P=function(x){return x?'<p>'+esc(x)+'</p>':''};
+  return '<div class="cvdoc"><div class="cvh">'+(d.photo?'<img src="'+d.photo+'" alt="">':'')+'<div><h2>'+esc(d.name)+'</h2>'+(d.phone?'<div>📞 '+esc(d.phone)+'</div>':'')+(d.email?'<div>✉️ '+esc(d.email)+'</div>':'')+(d.addr?'<div>📍 '+esc(d.addr)+'</div>':'')+'</div></div>'+
+  S("নিজের সম্পর্কে",P(d.about))+S("শিক্ষাগত যোগ্যতা",P(d.edu)+P(d.edudet))+S("অভিজ্ঞতা",P(d.exp)+P(d.work))+
+  S("দক্ষতা",ch.length?'<div class="cvchips">'+ch.map(function(c){return '<span>'+esc(c)+'</span>'}).join("")+'</div>':'')+S("প্রত্যাশিত বেতন",d.salary?'<p>৳ '+esc(d.salary)+'</p>':'')+'</div>';
+}
+function openCV(d,own){
+  var note=own&&cvPct()<100?'<p class="co noprint">সিভি পূর্ণ করতে প্রোফাইল এডিট করে ছবি, নিজের সম্পর্কে ও অভিজ্ঞতা যোগ করুন।</p>':'';
+  document.getElementById("sheet").innerHTML=cvHTML(d)+note+'<div class="noprint" style="margin-top:14px"><button class="btn" data-act="print">PDF / প্রিন্ট করুন</button></div>'+(own?'<div class="noprint" style="margin-top:10px"><button class="btn alt" data-act="editp">তথ্য এডিট করুন</button></div>':'')+'<div class="noprint" style="margin-top:10px"><button class="btn alt" id="close">বন্ধ করুন</button></div>';
+  document.getElementById("bg").classList.add("on");
+}
+function fileToPhoto(file,cb){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var W=300,H=400,c=document.createElement("canvas");c.width=W;c.height=H;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,W,H);var sc=Math.max(W/im.width,H/im.height),w=im.width*sc,h=im.height*sc;x.drawImage(im,(W-w)/2,(H-h)/2,w,h);cb(c.toDataURL("image/jpeg",0.8))};im.onerror=function(){cb(null)};im.src=r.result};r.onerror=function(){cb(null)};r.readAsDataURL(file)}
 function viewMe(){
-  var p=st.profile||{},e=isEmp(),pc=pct();
+  var p=st.profile||{},e=isEmp(),pc=pct(),cp=cvPct();
   var ph=st.user.phoneNumber?esc(st.user.phoneNumber)+' <span class="badge">✓ যাচাইকৃত</span>':"যাচাই করা হয়নি";
   var addr=[p.dist,p.div?p.div+" বিভাগ":""].filter(Boolean).join(", ");
   var rows=e?[["কোম্পানি",p.company],["জেলা",addr],["ঠিকানা",p.address]]:[["শিক্ষাগত যোগ্যতা",p.edu],["অভিজ্ঞতা",p.exp],["দক্ষতা",p.skills],["বর্তমান ঠিকানা",addr],["প্রত্যাশিত বেতন",p.salary]];
-  var h='<div class="pcard"><div class="pav">'+esc(Array.from(dname())[0])+'</div><div><h2 class="pt" style="margin:0">'+esc(dname())+'</h2><div class="co">'+esc(st.user.email)+'</div><div class="co">'+ph+'</div></div></div>'+
-  '<div class="pbar"><div class="prow"><span>প্রোফাইল সম্পূর্ণ</span><b>'+bn(pc)+'%</b></div><div class="track"><div class="fill" style="width:'+pc+'%"></div></div></div>';
+  var h='<div class="pcard"><label class="pphoto" for="pfile">'+(p.photo?'<img src="'+p.photo+'" alt="">':'<span>📷<br>ছবি দিন</span>')+'</label><input id="pfile" type="file" accept="image/*" hidden><div><h2 class="pt" style="margin:0">'+esc(dname())+'</h2><div class="co">'+esc(st.user.email)+'</div><div class="co">'+ph+'</div></div></div>'+
+  '<div class="pboxes"><button class="pb'+(e?' full':'')+'" data-act="editp"><div class="prow"><span>প্রোফাইল সম্পূর্ণ</span><b>'+bn(pc)+'%</b></div><div class="track"><div class="fill" style="width:'+pc+'%"></div></div></button>'+(e?'':'<button class="pb" data-act="cv"><div class="prow"><span>সিভি</span><b>'+bn(cp)+'%</b></div><div class="track"><div class="fill" style="width:'+cp+'%"></div></div></button>')+'</div>';
   h+=e?'<div class="qg3"><div><b>'+bn(st.mine.length)+'</b><span>মোট চাকরি</span></div><div><b>'+bn(st.mine.filter(function(j){return !j.closed}).length)+'</b><span>চালু</span></div><div><b>'+bn(st.apps.length)+'</b><span>আবেদন</span></div></div>':
   '<div class="qg3 two"><div><b>'+bn(st.apps.length)+'</b><span>আবেদন করেছি</span></div><div><b>'+bn(st.saved.length)+'</b><span>সেভ করেছি</span></div></div>';
   h+='<div class="drows">'+rows.map(function(r){return '<div class="drow"><span>'+r[0]+'</span><b>'+esc(r[1]||"—")+'</b></div>'}).join("")+'</div>'+
@@ -290,14 +324,14 @@ function openProfile(){
   if(e)h+='<label for="ec">কোম্পানির নাম</label><input id="ec" value="'+esc(p.company||"")+'">';
   else h+='<label for="eed">শিক্ষাগত যোগ্যতা</label><select id="eed"><option value="">নির্বাচন করুন</option>'+opts(EDU,p.edu)+'</select>'+
     '<label for="eex">অভিজ্ঞতা</label><select id="eex"><option value="">নির্বাচন করুন</option>'+opts(EXP,p.exp)+'</select>'+
-    '<label for="esk">দক্ষতা</label><input id="esk" placeholder="যেমন: ড্রাইভিং, MS Excel, ইংরেজি" value="'+esc(p.skills||"")+'">';
+    '<label for="esk">দক্ষতা</label><input id="esk" placeholder="যেমন: ড্রাইভিং, MS Excel, ইংরেজি" value="'+esc(p.skills||"")+'">'+'<label for="eab">নিজের সম্পর্কে (২-৩ লাইন)</label><textarea id="eab">'+esc(p.about||"")+'</textarea><label for="eedd">শিক্ষার বিস্তারিত (প্রতিষ্ঠান, পাসের সন)</label><textarea id="eedd">'+esc(p.edudet||"")+'</textarea><label for="ewk">পূর্বের কাজের অভিজ্ঞতা</label><textarea id="ewk">'+esc(p.work||"")+'</textarea>';
   h+='<label for="ediv">বিভাগ</label><select id="ediv">'+opts(Object.keys(LOC),dv)+'</select><label for="edist">জেলা</label><select id="edist">'+opts(LOC[dv],ds)+'</select>';
   h+=e?'<label for="ea">ঠিকানা (এলাকা, রোড)</label><input id="ea" value="'+esc(p.address||"")+'">':'<label for="es">প্রত্যাশিত বেতন</label><input id="es" placeholder="যেমন: ২০,০০০" value="'+esc(p.salary||"")+'">';
   document.getElementById("sheet").innerHTML=h+'<div class="err" id="eerr"></div><div style="margin-top:14px"><button class="btn" id="savep">সেভ করুন</button></div><div style="margin-top:10px"><button class="btn alt" id="close">বাতিল</button></div>';
   document.getElementById("bg").classList.add("on");
 }
 function render(){var hx=document.getElementById("hextra"),av=document.getElementById("av");
-  if(av){av.hidden=!st.user;if(st.user)av.textContent=dname().trim().charAt(0).toUpperCase()}
+  if(av){av.hidden=!st.user;if(st.user){if(st.profile&&st.profile.photo)av.innerHTML='<img src="'+st.profile.photo+'" alt="">';else av.textContent=dname().trim().charAt(0).toUpperCase()}}
   if(hx){var old=document.getElementById("hq"),ov=old?old.value:"",of=old&&document.activeElement===old,sv=nStats();
     hx.innerHTML=(st.user&&st.tab==="home")?'<div class="hsearch"><input id="hq" type="search" placeholder="চাকরি খুঁজুন" aria-label="চাকরি খুঁজুন"><button id="hsearch" aria-label="খুঁজুন">🔍</button></div><div class="stats"><div><b>'+bn(sv[0])+'</b><span>চালু চাকরি</span></div><div><b>'+bn(sv[1])+'</b><span>কোম্পানি</span></div><div><b>'+bn(sv[2])+'</b><span>নতুন চাকরি</span></div></div>':'<p class="tag">দেশের চাকরি, এক জায়গায়</p>';
     var nq=document.getElementById("hq");if(nq&&ov){nq.value=ov;if(of)nq.focus()}}
@@ -318,7 +352,7 @@ function openJob(id){
   var form=isEmp()?'<p class="co">আবেদন করতে চাকরিপ্রার্থীর অ্যাকাউন্ট লাগবে।</p>':ap?'<p><span class="badge">আপনি আবেদন করেছেন</span></p>':
   '<h4>আবেদন করুন</h4><label for="an">আপনার নাম</label><input id="an" autocomplete="name" value="'+esc(dname())+'">'+
   '<label for="am">মোবাইল নম্বর</label><input id="am" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel" value="'+esc(st.user.phoneNumber||"")+'">'+
-  '<label for="al">সংক্ষিপ্ত পরিচয়</label><textarea id="al"></textarea>'+(pct()<100?'<p class="co">প্রোফাইলে শিক্ষা, অভিজ্ঞতা ও দক্ষতা দিলে তা আবেদনের সঙ্গে নিয়োগকর্তা দেখতে পাবেন।</p>':'')+'<div class="err" id="aerr"></div>'+
+  '<label for="al">সংক্ষিপ্ত পরিচয়</label><textarea id="al"></textarea>'+'<p class="co">আবেদনের সঙ্গে আপনার প্রোফাইলের তথ্য, ছবি ও সিভি নিয়োগকর্তা দেখতে পাবেন।</p>'+'<div class="err" id="aerr"></div>'+
   '<div style="margin-top:14px"><button class="btn" id="doapply">আবেদন জমা দিন</button></div>';
   s.innerHTML='<h2>'+esc(j.t)+'</h2><div class="co">'+esc(j.c)+' – '+esc(locStr(j))+'</div>'+
   '<div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>'+esc(j.type)+'</span></div>'+
@@ -343,6 +377,10 @@ document.addEventListener("click",function(e){
   if(t.id==="swap"){st.mode=st.mode==="login"?"signup":"login";st.err="";render();return}
   if(t.id==="logout"){signOut(auth);return}
   if(t.id==="editp"){openProfile();return}
+  var ac=t.closest("[data-act]");
+  if(ac){var k=ac.getAttribute("data-act");if(k==="editp")openProfile();else if(k==="cv")openCV(cvData(),true);else if(k==="print")window.print();return}
+  var ca=t.closest("[data-cvapp]");
+  if(ca){var ap2=st.apps[+ca.getAttribute("data-cvapp")];if(ap2)openCV(appCV(ap2),false);return}
   var tg=t.closest("[data-toggle]");
   if(tg){var i2=tg.getAttribute("data-toggle"),jj=st.mine.filter(function(j){return j.id===i2})[0];if(jj){var cl=!jj.closed;updateDoc(doc(db,"jobs",i2),{closed:cl}).then(function(){toast(cl?"চাকরি বন্ধ হয়েছে":"চাকরি আবার চালু হয়েছে")})}return}
   var dl=t.closest("[data-del]");
@@ -350,7 +388,7 @@ document.addEventListener("click",function(e){
   if(t.id==="savep"){
     var g=function(i){var x=document.getElementById(i);return x?x.value.trim():""};
     var nm=g("en");if(!nm){showErr("eerr","আপনার নাম লিখুন।");return}
-    var d=isEmp()?{name:nm,company:g("ec"),address:g("ea"),div:g("ediv"),dist:g("edist")}:{name:nm,edu:g("eed"),exp:g("eex"),skills:g("esk"),salary:g("es"),div:g("ediv"),dist:g("edist")};
+    var d=isEmp()?{name:nm,company:g("ec"),address:g("ea"),div:g("ediv"),dist:g("edist")}:{name:nm,edu:g("eed"),exp:g("eex"),skills:g("esk"),about:g("eab"),edudet:g("eedd"),work:g("ewk"),salary:g("es"),div:g("ediv"),dist:g("edist")};
     t.disabled=true;
     setDoc(doc(db,"users",st.user.uid),d,{merge:true}).then(function(){Object.assign(st.profile,d);closeSheet();render();toast("প্রোফাইল সেভ হয়েছে")}).catch(function(){t.disabled=false;showErr("eerr","সেভ করা যায়নি। আবার চেষ্টা করুন।")});
     return}
@@ -384,7 +422,7 @@ document.addEventListener("click",function(e){
     if(!n){showErr("aerr","আপনার নাম লিখুন।");return}
     if(!/^(\+?88)?01[3-9]\d{8}$/.test(m)){showErr("aerr","সঠিক মোবাইল নম্বর দিন, যেমন 01712345678।");return}
     t.disabled=true;
-    addDoc(collection(db,"applications"),{jobId:j.id,title:j.t,company:j.c,employerId:j.uid,userId:st.user.uid,name:n,phone:m,edu:st.profile.edu||"",exp:st.profile.exp||"",skills:st.profile.skills||"",loc:[st.profile.dist,st.profile.div].filter(Boolean).join(", "),salary:st.profile.salary||"",note:document.getElementById("al").value.trim(),createdAt:serverTimestamp()})
+    addDoc(collection(db,"applications"),{jobId:j.id,title:j.t,company:j.c,employerId:j.uid,userId:st.user.uid,name:n,phone:m,edu:st.profile.edu||"",exp:st.profile.exp||"",skills:st.profile.skills||"",loc:[st.profile.dist,st.profile.div].filter(Boolean).join(", "),photo:st.profile.photo||"",about:st.profile.about||"",edudet:st.profile.edudet||"",work:st.profile.work||"",email:st.user.email,salary:st.profile.salary||"",note:document.getElementById("al").value.trim(),createdAt:serverTimestamp()})
     .then(function(){closeSheet();toast("আবেদন জমা হয়েছে")}).catch(function(){t.disabled=false;showErr("aerr","আবেদন জমা হয়নি। আবার চেষ্টা করুন।")});
     return}
   if(t.id==="dopost"){
@@ -402,6 +440,7 @@ document.addEventListener("change",function(e){var id=e.target.id,v=e.target.val
   else if(id==="fdist"){st.dist=v;render()}
   else if(id==="pdiv"){document.getElementById("pdist").innerHTML=opts(LOC[v]);syncUp()}
   else if(id==="pdist"){syncUp()}
+  else if(id==="pfile"){var f=e.target.files[0];if(f)fileToPhoto(f,function(d){if(!d){toast("ছবি পড়া যায়নি");return}setDoc(doc(db,"users",st.user.uid),{photo:d},{merge:true}).then(function(){st.profile.photo=d;render();toast("ছবি সেভ হয়েছে")}).catch(function(){toast("ছবি সেভ করা যায়নি")})})}
   else if(id==="ediv"){document.getElementById("edist").innerHTML=opts(LOC[v])}
   else if(id==="pup"){document.getElementById("pupx").style.display=v==="অন্যান্য"?"":"none"}
 });
