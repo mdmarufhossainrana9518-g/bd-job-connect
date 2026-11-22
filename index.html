@@ -207,7 +207,7 @@ function card(j){
   var sv=st.saved.indexOf(j.id)>-1,ap=!isEmp()&&st.apps.some(function(a){return a.jobId===j.id});
   return '<article class="job" data-open="'+esc(j.id)+'"><div class="row"><div><h3>'+esc(j.t)+'</h3><div class="co">'+esc(j.c)+'</div></div>'+
   '<button class="save" data-save="'+esc(j.id)+'" aria-pressed="'+sv+'" aria-label="'+(sv?"সেভ বাতিল করুন":"সেভ করুন")+'">'+(sv?"★":"☆")+'</button></div>'+
-  '<div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>'+esc(locStr(j))+'</span><span>'+esc(j.type)+'</span>'+(ap?'<span class="badge">আবেদন করা হয়েছে</span>':'')+'</div></article>';
+  '<div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>'+esc(locStr(j))+'</span><span>'+esc(j.type)+'</span>'+(j.edu&&j.edu!=="প্রয়োজন নেই"?'<span>🎓 '+esc(j.edu)+'</span>':'')+(ap?'<span class="badge">আবেদন করা হয়েছে</span>':'')+'</div></article>';
 }
 function bn(n){return n.toLocaleString("bn-BD")}
 function nStats(){var cs={},nw=0,wk=Date.now()-6048e5;st.jobs.forEach(function(j){cs[(j.c||"").trim()]=1;var t=j.createdAt&&j.createdAt.toMillis?j.createdAt.toMillis():Date.now();if(t>=wk)nw++});return [st.jobs.length,Object.keys(cs).length,nw]}
@@ -275,6 +275,12 @@ function viewPost(){
   '<label for="pup">উপজেলা / থানা / সিটি কর্পোরেশন</label><select id="pup">'+opts(UP["ঢাকা"].concat(["অন্যান্য"]),UP["ঢাকা"][0])+'</select>'+
   '<input id="pupx" placeholder="এলাকার নাম লিখুন" style="display:none;margin-top:8px">'+
   '<label for="ps">বেতন (যেমন ২০,০০০ – ৩০,০০০)</label><input id="ps">'+
+  '<label for="ptype">চাকরির ধরন</label><select id="ptype">'+opts(["ফুল টাইম","পার্ট টাইম","চুক্তিভিত্তিক","ইন্টার্নশিপ"],"ফুল টাইম")+'</select>'+
+  '<label for="pedu">শিক্ষাগত যোগ্যতা</label><select id="pedu">'+opts(["প্রয়োজন নেই","অষ্টম শ্রেণি","এসএসসি","এইচএসসি","ডিপ্লোমা","স্নাতক","স্নাতকোত্তর"],"প্রয়োজন নেই")+'</select>'+
+  '<input id="pesub" placeholder="বিষয় বা অতিরিক্ত যোগ্যতা (ঐচ্ছিক)" style="margin-top:8px">'+
+  '<label for="pexp">অভিজ্ঞতা</label><select id="pexp">'+opts(["প্রয়োজন নেই","১ বছরের কম","১–৩ বছর","৩–৫ বছর","৫+ বছর"],"প্রয়োজন নেই")+'</select>'+
+  '<label for="pvac">পদের সংখ্যা</label><input id="pvac" type="number" inputmode="numeric" min="1" placeholder="যেমন: ২">'+
+  '<label for="pdl">আবেদনের শেষ তারিখ</label><input id="pdl" type="date" min="'+new Date().toISOString().slice(0,10)+'">'+
   '<label for="pd">কাজের বিবরণ</label><textarea id="pd"></textarea>'+
   '<div class="err" id="perr"></div><div style="margin-top:14px"><button class="btn" id="dopost">চাকরি পোস্ট করুন</button></div>';
 }
@@ -345,6 +351,11 @@ function render(){var hx=document.getElementById("hextra"),av=document.getElemen
   var q=document.getElementById("q");
   if(q&&st.keepFocus){q.focus();q.setSelectionRange(q.value.length,q.value.length);st.keepFocus=false}
 }
+function fmtDate(x){if(/^\d{4}-\d{2}-\d{2}$/.test(x||"")){try{return new Date(x+"T00:00:00").toLocaleDateString("bn-BD",{day:"numeric",month:"long",year:"numeric"})}catch(e){}}return x||""}
+function jrows(j){
+  var r=[["চাকরির ধরন",j.type],["শিক্ষাগত যোগ্যতা",[j.edu,j.esub].filter(Boolean).join(" – ")],["অভিজ্ঞতা",j.exp],["পদের সংখ্যা",j.vac?bn(+j.vac||0)+"জন":""],["আবেদনের শেষ তারিখ",fmtDate(j.dl)]].filter(function(x){return x[1]});
+  return r.length?'<div class="drows">'+r.map(function(x){return '<div class="drow"><span>'+x[0]+'</span><b>'+esc(x[1])+'</b></div>'}).join("")+'</div>':'';
+}
 function openJob(id){
   var j=byId(id);if(!j)return;st.sel=j;
   var ap=st.apps.some(function(a){return a.jobId===id});
@@ -356,7 +367,7 @@ function openJob(id){
   '<div style="margin-top:14px"><button class="btn" id="doapply">আবেদন জমা দিন</button></div>';
   s.innerHTML='<h2>'+esc(j.t)+'</h2><div class="co">'+esc(j.c)+' – '+esc(locStr(j))+'</div>'+
   '<div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>'+esc(j.type)+'</span></div>'+
-  '<h4>কাজের বিবরণ</h4><p>'+esc(j.d)+'</p>'+form+'<div style="margin-top:10px"><button class="btn alt" id="close">বন্ধ করুন</button></div>';
+  jrows(j)+'<h4>কাজের বিবরণ</h4><p>'+esc(j.d)+'</p>'+form+'<div style="margin-top:10px"><button class="btn alt" id="close">বন্ধ করুন</button></div>';
   document.getElementById("bg").classList.add("on");
 }
 function closeSheet(){document.getElementById("bg").classList.remove("on")}
@@ -429,7 +440,7 @@ document.addEventListener("click",function(e){
     var a=document.getElementById("pt").value.trim(),b=document.getElementById("pc").value.trim(),d=document.getElementById("pd").value.trim();
     if(!a||!b||!d){showErr("perr","পদের নাম, কোম্পানি ও বিবরণ পূরণ করুন।");return}
     var s=document.getElementById("ps").value.trim();t.disabled=true;
-    addDoc(collection(db,"jobs"),{t:a,c:b,cat:document.getElementById("pcat").value,div:document.getElementById("pdiv").value,dist:document.getElementById("pdist").value,up:getUp(),city:document.getElementById("pdist").value,sal:s?"৳ "+s:"আলোচনা সাপেক্ষে",type:"ফুল টাইম",d:d,uid:st.user.uid,createdAt:serverTimestamp()})
+    addDoc(collection(db,"jobs"),{t:a,c:b,cat:document.getElementById("pcat").value,div:document.getElementById("pdiv").value,dist:document.getElementById("pdist").value,up:getUp(),city:document.getElementById("pdist").value,sal:s?"৳ "+s:"আলোচনা সাপেক্ষে",type:document.getElementById("ptype").value,edu:document.getElementById("pedu").value,esub:document.getElementById("pesub").value.trim(),exp:document.getElementById("pexp").value,vac:document.getElementById("pvac").value.trim(),dl:document.getElementById("pdl").value,d:d,uid:st.user.uid,createdAt:serverTimestamp()})
     .then(function(){st.tab="jobs";st.cat="সব";st.div="সব";st.dist="সব";st.q="";render();toast("চাকরি পোস্ট হয়েছে");window.scrollTo(0,0)})
     .catch(function(){t.disabled=false;showErr("perr","পোস্ট করা যায়নি। আবার চেষ্টা করুন।")});
   }
