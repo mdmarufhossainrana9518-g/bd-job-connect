@@ -89,9 +89,10 @@ span.cat{cursor:default}
 <nav><div class="in" id="tabs"></div></nav>
 <div class="sheet-bg" id="bg"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status"></div>
+<div id="rc"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,RecaptchaVerifier,linkWithPhoneNumber} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,collection,doc,setDoc,getDoc,addDoc,onSnapshot,query,where,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 /* Firebase Console > Project settings > Your apps > Web app থেকে এই মানগুলো বসান */
@@ -124,8 +125,9 @@ function opts(l,sel,all){return (all?'<option value="সব">'+all+'</option>':'
 function locStr(j){return [j.up,j.dist||j.city,j.div?j.div+" বিভাগ":""].filter(Boolean).join(", ")}
 function syncUp(){var d=document.getElementById("pdist").value,p=document.getElementById("pup");p.innerHTML=opts((UP[d]||[]).concat(["অন্যান্য"]));document.getElementById("pupx").style.display=p.value==="অন্যান্য"?"":"none"}
 function getUp(){var v=document.getElementById("pup").value;return v==="অন্যান্য"?document.getElementById("pupx").value.trim():v}
+var PERR={"auth/invalid-phone-number":"সঠিক মোবাইল নম্বর দিন।","auth/too-many-requests":"অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।","auth/billing-not-enabled":"SMS পাঠাতে Firebase-এ Blaze প্ল্যান চালু করতে হবে।","auth/operation-not-allowed":"Firebase-এ Phone সাইন-ইন চালু করা নেই, অথবা এই দেশে SMS বন্ধ আছে।","auth/credential-already-in-use":"এই নম্বর আরেকটি অ্যাকাউন্টে ব্যবহার হয়েছে।","auth/account-exists-with-different-credential":"এই নম্বর আরেকটি অ্যাকাউন্টে ব্যবহার হয়েছে।","auth/invalid-verification-code":"কোডটি ভুল। আবার দিন।","auth/code-expired":"কোডের সময় শেষ। নতুন কোড নিন।","auth/captcha-check-failed":"নিরাপত্তা যাচাই ব্যর্থ। আবার চেষ্টা করুন।"};
 var AERR={"auth/invalid-credential":"ইমেইল বা পাসওয়ার্ড ভুল।","auth/invalid-email":"সঠিক ইমেইল দিন।","auth/email-already-in-use":"এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে।","auth/weak-password":"পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।","auth/network-request-failed":"ইন্টারনেট সংযোগ পরীক্ষা করুন।"};
-var st={jobs:[],apps:[],saved:[],tab:"jobs",q:"",cat:"সব",div:"সব",dist:"সব",sel:null,user:null,profile:null,mode:"login",landing:true,pending:{},err:""};
+var st={jobs:[],apps:[],saved:[],tab:"jobs",q:"",cat:"সব",div:"সব",dist:"সব",sel:null,user:null,profile:null,mode:"login",landing:true,needPhone:false,conf:null,phone:"",pending:{},err:""};
 try{st.saved=JSON.parse(localStorage.getItem("bjc_saved")||"[]")}catch(e){}
 function keep(){try{localStorage.setItem("bjc_saved",JSON.stringify(st.saved))}catch(e){}}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -144,11 +146,13 @@ function subscribe(){
   unsub.push(onSnapshot(query(collection(db,"applications"),where(f,"==",st.user.uid)),function(s){st.apps=s.docs.map(function(d){return d.data()});soft()}));
 }
 onAuthStateChanged(auth,async function(u){
-  if(!u){cleanup();st.user=null;st.profile=null;st.landing=true;render();return}
+  if(!u){cleanup();st.user=null;st.profile=null;st.landing=true;st.needPhone=false;st.conf=null;render();return}
   try{
     var r=doc(db,"users",u.uid),s=await getDoc(r);
     if(!s.exists()){await setDoc(r,{name:st.pending.name||"",role:st.pending.role||"seeker"});s=await getDoc(r)}
-    st.user=u;st.profile=s.data();st.tab="home";subscribe();render();
+    st.user=u;st.profile=s.data();st.tab="home";
+    if(!u.phoneNumber){st.needPhone=true;cleanup();render();return}
+    st.needPhone=false;subscribe();render();
   }catch(e){st.err="ডেটা লোড করা যায়নি। Firestore চালু আছে কিনা দেখুন।";render()}
 });
 
@@ -172,6 +176,13 @@ function viewHome(){
   h+='<h3 class="sec">ক্যাটাগরি অনুযায়ী খুঁজুন</h3><div class="grid">'+CATS.slice(1).map(function(c){return '<button class="cat" data-hcat="'+c+'">'+c+'</button>'}).join("")+'</div>'+
   '<h3 class="sec">সর্বশেষ চাকরি</h3>'+(l.length?l.map(card).join("")+'<button class="btn alt" data-tab="jobs">সব চাকরি দেখুন</button>':'<div class="empty">এখনো কোনো চাকরি পোস্ট হয়নি।</div>');
   return h;
+}
+function viewPhone(){
+  var sent=!!st.conf;
+  return '<h2 class="pt" style="margin-top:14px">মোবাইল নম্বর যাচাই করুন</h2><p class="co">'+(sent?esc(st.phone)+' নম্বরে ৬ সংখ্যার কোড পাঠানো হয়েছে।':'চালিয়ে যেতে আপনার মোবাইল নম্বরে একটি কোড পাঠানো হবে।')+'</p>'+
+  (sent?'<label for="otp">যাচাইকরণ কোড</label><input id="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><div class="err" id="perr2"></div><div style="margin-top:14px"><button class="btn" id="verify">যাচাই করুন</button></div><div style="margin-top:10px"><button class="btn alt" id="chg">নম্বর বদলান</button></div>':
+  '<label for="ph">মোবাইল নম্বর</label><input id="ph" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel"><div class="err" id="perr2"></div><div style="margin-top:14px"><button class="btn" id="sendotp">কোড পাঠান</button></div>')+
+  '<div style="margin-top:10px"><button class="btn alt" id="logout">লগআউট</button></div>';
 }
 function viewAuth(){
   var su=st.mode==="signup",setup=CFG.apiKey.indexOf("YOUR")===0;
@@ -222,8 +233,9 @@ function viewPost(){
 function viewMe(){
   return '<h2 class="pt">আমার অ্যাকাউন্ট</h2><p>'+esc(st.profile.name)+'</p><p class="co">'+esc(st.user.email)+' – '+(isEmp()?"নিয়োগকর্তা":"চাকরিপ্রার্থী")+'</p><div style="margin-top:14px"><button class="btn alt" id="logout">লগআউট</button></div>';
 }
-function render(){var hc=document.getElementById("hcount");if(hc)hc.textContent=st.user?st.jobs.length+"টি চাকরি খোলা আছে":"";
+function render(){var hc=document.getElementById("hcount");if(hc)hc.textContent=st.user&&!st.needPhone?st.jobs.length+"টি চাকরি খোলা আছে":"";
   var v=document.getElementById("view"),nav=document.querySelector("nav");
+  if(st.user&&st.needPhone){v.innerHTML=viewPhone();nav.style.display="none";return}
   if(!st.user){v.innerHTML=st.landing?viewLanding():viewAuth();nav.style.display="none";return}
   nav.style.display="";
   v.innerHTML=st.tab==="home"?viewHome():st.tab==="jobs"?viewJobs():st.tab==="saved"?viewSaved():st.tab==="applied"?viewApplied():st.tab==="post"?viewPost():viewMe();
@@ -238,7 +250,7 @@ function openJob(id){
   var s=document.getElementById("sheet");
   var form=isEmp()?'<p class="co">আবেদন করতে চাকরিপ্রার্থীর অ্যাকাউন্ট লাগবে।</p>':ap?'<p><span class="badge">আপনি আবেদন করেছেন</span></p>':
   '<h4>আবেদন করুন</h4><label for="an">আপনার নাম</label><input id="an" autocomplete="name" value="'+esc(st.profile.name)+'">'+
-  '<label for="am">মোবাইল নম্বর</label><input id="am" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel">'+
+  '<label for="am">মোবাইল নম্বর</label><input id="am" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel" value="'+esc(st.user.phoneNumber||"")+'">'+
   '<label for="al">সংক্ষিপ্ত পরিচয়</label><textarea id="al"></textarea><div class="err" id="aerr"></div>'+
   '<div style="margin-top:14px"><button class="btn" id="doapply">আবেদন জমা দিন</button></div>';
   s.innerHTML='<h2>'+esc(j.t)+'</h2><div class="co">'+esc(j.c)+' – '+esc(locStr(j))+'</div>'+
@@ -263,6 +275,25 @@ document.addEventListener("click",function(e){
   if(t.id==="close"||t.id==="bg"){closeSheet();return}
   if(t.id==="swap"){st.mode=st.mode==="login"?"signup":"login";st.err="";render();return}
   if(t.id==="logout"){signOut(auth);return}
+  if(t.id==="chg"){st.conf=null;render();return}
+  if(t.id==="sendotp"){
+    var ph=document.getElementById("ph").value.trim();
+    if(!/^(\+?88)?01[3-9]\d{8}$/.test(ph)){showErr("perr2","সঠিক মোবাইল নম্বর দিন, যেমন 01712345678।");return}
+    var full="+88"+ph.replace(/^\+?88/,"");t.disabled=true;
+    try{if(!window.rv)window.rv=new RecaptchaVerifier(auth,"rc",{size:"invisible"})}catch(x){}
+    linkWithPhoneNumber(auth.currentUser,full,window.rv).then(function(c){st.conf=c;st.phone=full;render()})
+    .catch(function(x){t.disabled=false;try{window.rv.clear()}catch(e){}window.rv=null;showErr("perr2",PERR[x.code]||"কোড পাঠানো যায়নি। আবার চেষ্টা করুন।")});
+    return}
+  if(t.id==="verify"){
+    var code=document.getElementById("otp").value.trim();
+    if(code.length!==6){showErr("perr2","৬ সংখ্যার কোডটি লিখুন।");return}
+    t.disabled=true;
+    st.conf.confirm(code).then(async function(){
+      await auth.currentUser.reload();st.user=auth.currentUser;
+      await setDoc(doc(db,"users",st.user.uid),{phone:st.user.phoneNumber},{merge:true});
+      st.needPhone=false;st.conf=null;st.tab="home";subscribe();render();toast("মোবাইল নম্বর যাচাই হয়েছে");
+    }).catch(function(x){t.disabled=false;showErr("perr2",PERR[x.code]||"যাচাই করা যায়নি। আবার চেষ্টা করুন।")});
+    return}
   if(t.id==="doauth"){
     var em=document.getElementById("em").value.trim(),pw=document.getElementById("pw").value,su=st.mode==="signup";
     if(su){var nm=document.getElementById("nm").value.trim();if(!nm){showErr("aerr2","আপনার নাম লিখুন।");return}st.pending={name:nm,role:document.getElementById("rl").value}}
