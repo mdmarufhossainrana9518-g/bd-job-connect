@@ -57,14 +57,26 @@ label{display:block;font-weight:600;margin:12px 0 4px;font-size:15px}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:40;display:none;max-width:90%}
 .err{color:var(--danger);font-size:14px;margin-top:4px}
 h2.pt{font-size:22px;margin:6px 0 2px}
+header.top{background:var(--brand);color:var(--brand-ink);padding:20px 0 26px;border-radius:0 0 26px 26px;margin-bottom:6px;position:relative;overflow:hidden}
+header.top::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:var(--accent);opacity:.2}
+header.top .in{max-width:640px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
+header.top .logo{font-size:24px;gap:12px}
+header.top .mark{width:42px;height:42px;border-radius:13px;background:var(--brand-ink)}
+header.top .mark::before,header.top .mark::after{width:13px;height:13px;top:14px}
+header.top .mark::before{background:var(--brand);left:7px}
+header.top .mark::after{background:var(--accent);right:7px}
+header.top .tag{color:inherit;opacity:.88;margin:6px 0 0;font-size:15px}
+header.top .hc{display:inline-block;margin-top:12px;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 14px;font-size:14px}
+header.top .hc:empty{display:none}
 </style>
 </head>
 <body>
+<header class="top"><div class="in">
+  <div class="logo"><span class="mark" aria-hidden="true"></span><span>BD JOB CONNECT</span></div>
+  <p class="tag">দেশের চাকরি, এক জায়গায়</p>
+  <span class="hc" id="hcount"></span>
+</div></header>
 <div class="wrap">
-  <header>
-    <div class="logo"><span class="mark" aria-hidden="true"></span>BD JOB CONNECT</div>
-    <p class="tag">দেশের চাকরি, এক জায়গায়</p>
-  </header>
   <main id="view"></main>
 </div>
 <nav><div class="in" id="tabs"></div></nav>
@@ -188,7 +200,7 @@ function viewPost(){
 function viewMe(){
   return '<h2 class="pt">আমার অ্যাকাউন্ট</h2><p>'+esc(st.profile.name)+'</p><p class="co">'+esc(st.user.email)+' – '+(isEmp()?"নিয়োগকর্তা":"চাকরিপ্রার্থী")+'</p><div style="margin-top:14px"><button class="btn alt" id="logout">লগআউট</button></div>';
 }
-function render(){
+function render(){var hc=document.getElementById("hcount");if(hc)hc.textContent=st.user?st.jobs.length+"টি চাকরি খোলা আছে":"";
   var v=document.getElementById("view"),nav=document.querySelector("nav");
   if(!st.user){v.innerHTML=viewAuth();nav.style.display="none";return}
   nav.style.display="";
