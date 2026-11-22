@@ -79,7 +79,7 @@ import {getFirestore,collection,doc,setDoc,getDoc,addDoc,onSnapshot,query,where,
 var CFG={apiKey:"AIzaSyDYDaXkR2p0J334hjbvsHYSxK7-DXMY4KA",authDomain:"bd-job-connect-web.firebaseapp.com",projectId:"bd-job-connect-web",storageBucket:"bd-job-connect-web.firebasestorage.app",messagingSenderId:"158350327223",appId:"1:158350327223:web:2ef85570287e31cfde3c32"};
 
 var app=initializeApp(CFG),auth=getAuth(app),db=getFirestore(app);
-var CATS=["সব","আইটি","ব্যাংকিং","মার্কেটিং","শিক্ষা","গার্মেন্টস","স্বাস্থ্য"];
+var CATS=["সব","আইটি","ড্রাইভার","সেলস","অফিস সহকারী","ডেলিভারি","সিকিউরিটি","নির্মাণ","রেস্তোরাঁ","ব্যাংকিং","মার্কেটিং","শিক্ষা","গার্মেন্টস","স্বাস্থ্য","অন্যান্য"];
 var CITIES=["সব","ঢাকা","চট্টগ্রাম","সিলেট","রাজশাহী","খুলনা"];
 var AERR={"auth/invalid-credential":"ইমেইল বা পাসওয়ার্ড ভুল।","auth/invalid-email":"সঠিক ইমেইল দিন।","auth/email-already-in-use":"এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে।","auth/weak-password":"পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।","auth/network-request-failed":"ইন্টারনেট সংযোগ পরীক্ষা করুন।"};
 var st={jobs:[],apps:[],saved:[],tab:"jobs",q:"",cat:"সব",city:"সব",sel:null,user:null,profile:null,mode:"login",pending:{},err:""};
