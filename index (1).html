@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BD JOB CONNECT</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f1ea;--card:#fffefb;--ink:#14231f;--mute:#5d6b66;--line:#ddd9cc;--brand:#0c5a46;--brand-ink:#fff;--accent:#e0a21b;--danger:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1816;--card:#18241f;--ink:#eef2ee;--mute:#9aaba4;--line:#2a3a34;--brand:#3fb68f;--brand-ink:#05231a;--accent:#f0b840;--danger:#f2877f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1816;--card:#18241f;--ink:#eef2ee;--mute:#9aaba4;--line:#2a3a34;--brand:#3fb68f;--brand-ink:#05231a;--accent:#f0b840;--danger:#f2877f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Hind Siliguri","Noto Sans Bengali","Segoe UI",system-ui,sans-serif;font-size:16px;line-height:1.5;padding-bottom:84px}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{padding:20px 0 12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:22px;letter-spacing:.2px}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--brand);position:relative;flex:none}
+.mark::before,.mark::after{content:"";position:absolute;width:11px;height:11px;border-radius:50%;top:11px}
+.mark::before{left:6px;background:var(--brand-ink)}
+.mark::after{right:6px;background:var(--accent)}
+.tag{color:var(--mute);margin:2px 0 0 44px;font-size:14px}
+.search{display:flex;gap:8px;margin:14px 0 10px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+textarea{min-height:90px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.filters{display:flex;gap:8px;margin-bottom:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:6px 0 12px}
+.chip{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.count{color:var(--mute);font-size:14px;margin:4px 0 10px}
+.job{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--brand);border-radius:6px 14px 14px 6px;padding:14px;margin-bottom:12px;cursor:pointer}
+.job h3{margin:0 0 2px;font-size:18px;line-height:1.35}
+.co{color:var(--mute);font-size:15px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px}
+.sal{font-weight:600;color:var(--brand)}
+.row{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.save{border:0;background:none;font-size:22px;cursor:pointer;color:var(--mute);padding:2px 6px;line-height:1}
+.save[aria-pressed="true"]{color:var(--accent)}
+.badge{display:inline-block;font-size:13px;padding:1px 10px;border-radius:999px;background:var(--line);color:var(--ink)}
+.empty{text-align:center;color:var(--mute);padding:40px 10px;border:1.5px dashed var(--line);border-radius:14px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+nav .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav button{border:0;background:none;color:var(--mute);font:inherit;font-size:12px;padding:10px 0 8px;cursor:pointer}
+nav button b{display:block;font-size:20px;line-height:1.1}
+nav button[aria-current="page"]{color:var(--brand);font-weight:600}
+.btn{border:0;background:var(--brand);color:var(--brand-ink);font:inherit;font-weight:600;padding:12px 18px;border-radius:10px;cursor:pointer;width:100%}
+.btn.alt{background:none;color:var(--ink);border:1.5px solid var(--line)}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:30;display:none}
+.sheet-bg.on{display:block}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow:auto;background:var(--bg);border-radius:18px 18px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom,0px));max-width:640px;margin:0 auto}
+.sheet h2{margin:0 0 4px;font-size:22px;line-height:1.3}
+.sheet h4{margin:16px 0 4px;font-size:16px}
+.sheet p,.sheet li{margin:4px 0}
+label{display:block;font-weight:600;margin:12px 0 4px;font-size:15px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;z-index:40;display:none;max-width:90%}
+.err{color:var(--danger);font-size:14px;margin-top:4px}
+h2.pt{font-size:22px;margin:6px 0 2px}
+header.top{background:var(--brand);color:var(--brand-ink);padding:20px 0 26px;border-radius:0 0 26px 26px;margin-bottom:6px;position:relative;overflow:hidden}
+header.top::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:var(--accent);opacity:.2}
+header.top .in{max-width:640px;margin:0 auto;padding:0 16px;position:relative;z-index:1}
+header.top .logo{font-size:24px;gap:12px}
+header.top .mark{width:42px;height:42px;border-radius:13px;background:var(--brand-ink)}
+header.top .mark::before,header.top .mark::after{width:13px;height:13px;top:14px}
+header.top .mark::before{background:var(--brand);left:7px}
+header.top .mark::after{background:var(--accent);right:7px}
+header.top .tag{color:inherit;opacity:.88;margin:6px 0 0;font-size:15px}
+header.top .hc{display:inline-block;margin-top:12px;background:rgba(255,255,255,.18);border-radius:999px;padding:3px 14px;font-size:14px}
+header.top .hc:empty{display:none}
+.sec{font-size:18px;margin:22px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cat{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px;text-align:left;cursor:pointer}
+span.cat{cursor:default}
+.step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.step b{display:block}
+.step span{color:var(--mute);font-size:15px}
+.hrow{display:flex;align-items:center;gap:12px}
+.av{margin-left:auto;width:40px;height:40px;border-radius:50%;background:var(--brand-ink);color:var(--brand);display:grid;place-items:center;font:inherit;font-weight:700;font-size:18px;border:0;cursor:pointer}
+.av[hidden]{display:none}
+.hsearch{display:flex;background:var(--card);border-radius:12px;margin-top:14px;overflow:hidden}
+.hsearch input{border:0;border-radius:0;background:transparent;color:var(--ink)}
+.hsearch button{border:0;background:none;font-size:20px;padding:0 14px;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;margin-top:16px}
+.stats b{display:block;font-size:26px;line-height:1.2}
+.stats span{font-size:13px;opacity:.9}
+.qg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:16px}
+.q{background:none;border:0;font:inherit;color:var(--ink);font-size:13px;text-align:center;cursor:pointer;padding:4px 0}
+.q i{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 6px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-style:normal;font-size:26px}
+.fab{position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--accent);color:#1b1500;border:0;border-radius:999px;padding:12px 20px;font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:15;cursor:pointer}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div class="hrow"><div class="logo"><span class="mark" aria-hidden="true"></span><span>BD JOB CONNECT</span></div><button class="av" id="av" data-tab="me" hidden aria-label="আমার প্রোফাইল"></button></div>
+  <div id="hextra"></div>
+</div></header>
+<div class="wrap">
+  <main id="view"></main>
+</div>
+<nav><div class="in" id="tabs"></div></nav>
+<div class="sheet-bg" id="bg"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div id="rc"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,RecaptchaVerifier,linkWithPhoneNumber} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,collection,doc,setDoc,getDoc,addDoc,onSnapshot,query,where,orderBy,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* Firebase Console > Project settings > Your apps > Web app থেকে এই মানগুলো বসান */
+var CFG={apiKey:"AIzaSyDYDaXkR2p0J334hjbvsHYSxK7-DXMY4KA",authDomain:"bd-job-connect-web.firebaseapp.com",projectId:"bd-job-connect-web",storageBucket:"bd-job-connect-web.firebasestorage.app",messagingSenderId:"158350327223",appId:"1:158350327223:web:2ef85570287e31cfde3c32"};
+
+var app=initializeApp(CFG),auth=getAuth(app),db=getFirestore(app);
+var CATS=["সব","আইটি","ড্রাইভার","সেলস","অফিস সহকারী","ডেলিভারি","সিকিউরিটি","নির্মাণ","রেস্তোরাঁ","ব্যাংকিং","মার্কেটিং","শিক্ষা","গার্মেন্টস","স্বাস্থ্য","অন্যান্য"];
+var LOC={"ঢাকা":["ঢাকা","গাজীপুর","কিশোরগঞ্জ","মানিকগঞ্জ","মুন্সীগঞ্জ","নারায়ণগঞ্জ","নরসিংদী","টাঙ্গাইল","ফরিদপুর","গোপালগঞ্জ","মাদারীপুর","রাজবাড়ী","শরীয়তপুর"],
+"চট্টগ্রাম":["চট্টগ্রাম","কক্সবাজার","কুমিল্লা","ব্রাহ্মণবাড়িয়া","চাঁদপুর","ফেনী","লক্ষ্মীপুর","নোয়াখালী","খাগড়াছড়ি","রাঙামাটি","বান্দরবান"],
+"রাজশাহী":["রাজশাহী","বগুড়া","জয়পুরহাট","নওগাঁ","নাটোর","চাঁপাইনবাবগঞ্জ","পাবনা","সিরাজগঞ্জ"],
+"খুলনা":["খুলনা","বাগেরহাট","চুয়াডাঙ্গা","যশোর","ঝিনাইদহ","কুষ্টিয়া","মাগুরা","মেহেরপুর","নড়াইল","সাতক্ষীরা"],
+"বরিশাল":["বরিশাল","ভোলা","ঝালকাঠি","পটুয়াখালী","পিরোজপুর","বরগুনা"],
+"সিলেট":["সিলেট","হবিগঞ্জ","মৌলভীবাজার","সুনামগঞ্জ"],
+"রংপুর":["রংপুর","দিনাজপুর","কুড়িগ্রাম","গাইবান্ধা","লালমনিরহাট","নীলফামারী","পঞ্চগড়","ঠাকুরগাঁও"],
+"ময়মনসিংহ":["ময়মনসিংহ","জামালপুর","নেত্রকোণা","শেরপুর"]};
+var UP={"ঢাকা":["ঢাকা উত্তর সিটি কর্পোরেশন","ঢাকা দক্ষিণ সিটি কর্পোরেশন","মিরপুর থানা","উত্তরা থানা","গুলশান থানা","মোহাম্মদপুর থানা","ধানমন্ডি থানা","মতিঝিল থানা","যাত্রাবাড়ী থানা","ডেমরা থানা","সাভার","ধামরাই","কেরানীগঞ্জ","নবাবগঞ্জ","দোহার"],
+"গাজীপুর":["গাজীপুর সিটি কর্পোরেশন","গাজীপুর সদর","কালিয়াকৈর","কালীগঞ্জ","কাপাসিয়া","শ্রীপুর"],
+"নারায়ণগঞ্জ":["নারায়ণগঞ্জ সিটি কর্পোরেশন","আড়াইহাজার","বন্দর","রূপগঞ্জ","সোনারগাঁ"],
+"চট্টগ্রাম":["চট্টগ্রাম সিটি কর্পোরেশন","আনোয়ারা","বাঁশখালী","বোয়ালখালী","চন্দনাইশ","ফটিকছড়ি","হাটহাজারী","লোহাগাড়া","মীরসরাই","পটিয়া","রাঙ্গুনিয়া","রাউজান","সন্দ্বীপ","সাতকানিয়া","সীতাকুণ্ড"],
+"কক্সবাজার":["কক্সবাজার সদর","চকরিয়া","কুতুবদিয়া","মহেশখালী","পেকুয়া","রামু","টেকনাফ","উখিয়া"],
+"কুমিল্লা":["কুমিল্লা সিটি কর্পোরেশন","বুড়িচং","চান্দিনা","চৌদ্দগ্রাম","দাউদকান্দি","দেবিদ্বার","হোমনা","লাকসাম","মুরাদনগর","নাঙ্গলকোট","তিতাস"],
+"রাজশাহী":["রাজশাহী সিটি কর্পোরেশন","বাঘা","বাগমারা","চারঘাট","দুর্গাপুর","গোদাগাড়ী","মোহনপুর","পবা","পুঠিয়া","তানোর"],
+"খুলনা":["খুলনা সিটি কর্পোরেশন","বটিয়াঘাটা","দাকোপ","দিঘলিয়া","ডুমুরিয়া","কয়রা","পাইকগাছা","ফুলতলা","রূপসা","তেরখাদা"],
+"বরিশাল":["বরিশাল সিটি কর্পোরেশন","আগৈলঝাড়া","বাবুগঞ্জ","বাকেরগঞ্জ","বানারীপাড়া","গৌরনদী","হিজলা","মেহেন্দিগঞ্জ","মুলাদী","উজিরপুর"],
+"সিলেট":["সিলেট সিটি কর্পোরেশন","বালাগঞ্জ","বিয়ানীবাজার","বিশ্বনাথ","কোম্পানীগঞ্জ","ফেঞ্চুগঞ্জ","গোলাপগঞ্জ","গোয়াইনঘাট","জৈন্তাপুর","কানাইঘাট","জকিগঞ্জ","দক্ষিণ সুরমা","ওসমানীনগর"],
+"রংপুর":["রংপুর সিটি কর্পোরেশন","বদরগঞ্জ","গঙ্গাচড়া","কাউনিয়া","মিঠাপুকুর","পীরগাছা","পীরগঞ্জ","তারাগঞ্জ"],
+"ময়মনসিংহ":["ময়মনসিংহ সিটি কর্পোরেশন","ভালুকা","ধোবাউড়া","ফুলবাড়িয়া","গফরগাঁও","গৌরীপুর","হালুয়াঘাট","ঈশ্বরগঞ্জ","মুক্তাগাছা","নান্দাইল","ফুলপুর","ত্রিশাল"]};
+var ALLD=[].concat.apply([],Object.keys(LOC).map(function(k){return LOC[k]}));
+function opts(l,sel,all){return (all?'<option value="সব">'+all+'</option>':'')+l.map(function(c){return '<option'+(c===sel?' selected':'')+'>'+esc(c)+'</option>'}).join("")}
+function locStr(j){return [j.up,j.dist||j.city,j.div?j.div+" বিভাগ":""].filter(Boolean).join(", ")}
+function syncUp(){var d=document.getElementById("pdist").value,p=document.getElementById("pup");p.innerHTML=opts((UP[d]||[]).concat(["অন্যান্য"]));document.getElementById("pupx").style.display=p.value==="অন্যান্য"?"":"none"}
+function getUp(){var v=document.getElementById("pup").value;return v==="অন্যান্য"?document.getElementById("pupx").value.trim():v}
+var PERR={"auth/invalid-phone-number":"সঠিক মোবাইল নম্বর দিন।","auth/too-many-requests":"অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।","auth/billing-not-enabled":"SMS পাঠাতে Firebase-এ Blaze প্ল্যান চালু করতে হবে।","auth/operation-not-allowed":"Firebase-এ Phone সাইন-ইন চালু করা নেই, অথবা এই দেশে SMS বন্ধ আছে।","auth/credential-already-in-use":"এই নম্বর আরেকটি অ্যাকাউন্টে ব্যবহার হয়েছে।","auth/account-exists-with-different-credential":"এই নম্বর আরেকটি অ্যাকাউন্টে ব্যবহার হয়েছে।","auth/invalid-verification-code":"কোডটি ভুল। আবার দিন।","auth/code-expired":"কোডের সময় শেষ। নতুন কোড নিন।","auth/captcha-check-failed":"নিরাপত্তা যাচাই ব্যর্থ। আবার চেষ্টা করুন।"};
+var AERR={"auth/invalid-credential":"ইমেইল বা পাসওয়ার্ড ভুল।","auth/invalid-email":"সঠিক ইমেইল দিন।","auth/email-already-in-use":"এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট খোলা হয়েছে।","auth/weak-password":"পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।","auth/network-request-failed":"ইন্টারনেট সংযোগ পরীক্ষা করুন।"};
+var st={jobs:[],apps:[],saved:[],tab:"jobs",q:"",cat:"সব",div:"সব",dist:"সব",sel:null,user:null,profile:null,mode:"login",landing:true,needPhone:false,conf:null,phone:"",pending:{},err:""};
+try{st.saved=JSON.parse(localStorage.getItem("bjc_saved")||"[]")}catch(e){}
+function keep(){try{localStorage.setItem("bjc_saved",JSON.stringify(st.saved))}catch(e){}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display="none"},2200)}
+function byId(id){return st.jobs.filter(function(j){return j.id===id})[0]}
+function isEmp(){return st.profile&&st.profile.role==="employer"}
+function dt(a){try{return a.createdAt&&a.createdAt.toDate?a.createdAt.toDate().toLocaleDateString("bn-BD"):""}catch(e){return""}}
+
+var unsub=[];
+function cleanup(){unsub.forEach(function(f){f()});unsub=[];st.jobs=[];st.apps=[]}
+function soft(){if(st.tab!=="post")render()}
+function subscribe(){
+  cleanup();
+  unsub.push(onSnapshot(query(collection(db,"jobs"),orderBy("createdAt","desc")),function(s){st.jobs=s.docs.map(function(d){var x=d.data();x.id=d.id;return x});soft()}));
+  var f=isEmp()?"employerId":"userId";
+  unsub.push(onSnapshot(query(collection(db,"applications"),where(f,"==",st.user.uid)),function(s){st.apps=s.docs.map(function(d){return d.data()});soft()}));
+}
+onAuthStateChanged(auth,async function(u){
+  if(!u){cleanup();st.user=null;st.profile=null;st.landing=true;st.needPhone=false;st.conf=null;render();return}
+  try{
+    var r=doc(db,"users",u.uid),s=await getDoc(r);
+    if(!s.exists()){await setDoc(r,{name:st.pending.name||"",role:st.pending.role||"seeker"});s=await getDoc(r)}
+    st.user=u;st.profile=s.data();st.tab="home";
+    subscribe();render();
+  }catch(e){st.err="ডেটা লোড করা যায়নি। Firestore চালু আছে কিনা দেখুন।";render()}
+});
+
+function card(j){
+  var sv=st.saved.indexOf(j.id)>-1,ap=!isEmp()&&st.apps.some(function(a){return a.jobId===j.id});
+  return '<article class="job" data-open="'+esc(j.id)+'"><div class="row"><div><h3>'+esc(j.t)+'</h3><div class="co">'+esc(j.c)+'</div></div>'+
+  '<button class="save" data-save="'+esc(j.id)+'" aria-pressed="'+sv+'" aria-label="'+(sv?"সেভ বাতিল করুন":"সেভ করুন")+'">'+(sv?"★":"☆")+'</button></div>'+
+  '<div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>'+esc(locStr(j))+'</span><span>'+esc(j.type)+'</span>'+(ap?'<span class="badge">আবেদন করা হয়েছে</span>':'')+'</div></article>';
+}
+function bn(n){return n.toLocaleString("bn-BD")}
+function nStats(){var cs={},nw=0,wk=Date.now()-6048e5;st.jobs.forEach(function(j){cs[(j.c||"").trim()]=1;var t=j.createdAt&&j.createdAt.toMillis?j.createdAt.toMillis():Date.now();if(t>=wk)nw++});return [st.jobs.length,Object.keys(cs).length,nw]}
+function viewLanding(){
+  return '<h2 class="pt" style="font-size:26px;margin-top:16px">আপনার পরের চাকরি এখানেই</h2><p class="co">দেশের নিয়োগকর্তা ও চাকরিপ্রার্থীদের এক জায়গায় জুড়ে দিচ্ছে BD JOB CONNECT।</p>'+
+  '<div style="margin-top:14px"><button class="btn" data-go="signup">নতুন অ্যাকাউন্ট খুলুন</button></div><div style="margin-top:10px"><button class="btn alt" data-go="login">লগইন করুন</button></div>'+
+  '<h3 class="sec">কীভাবে কাজ করে</h3><div class="step"><b>চাকরিপ্রার্থী</b><span>অ্যাকাউন্ট খুলুন, বিভাগ ও জেলা দিয়ে চাকরি খুঁজুন, এক ট্যাপে আবেদন করুন।</span></div><div class="step"><b>নিয়োগকর্তা</b><span>বিজ্ঞপ্তি পোস্ট করুন, আবেদনকারীর নাম ও ফোন নম্বর সরাসরি পান।</span></div>'+
+  '<h3 class="sec">জনপ্রিয় ক্যাটাগরি</h3><div class="grid">'+CATS.slice(1,9).map(function(c){return '<span class="cat">'+c+'</span>'}).join("")+'</div>';
+}
+function viewHome(){
+  var l=st.jobs.slice(0,3),e=isEmp();
+  var Q=e?[["post","＋","চাকরি পোস্ট"],["applied","👥","আবেদনকারী"],["jobs","🔍","সব চাকরি"],["me","👤","প্রোফাইল"]]:[["applied","📄","আবেদন করা চাকরি"],["saved","⭐","সেভ করা চাকরি"],["jobs","🔍","সব চাকরি"],["me","👤","প্রোফাইল"]];
+  return '<div class="qg">'+Q.map(function(q){return '<button class="q" data-tab="'+q[0]+'"><i aria-hidden="true">'+q[1]+'</i>'+q[2]+'</button>'}).join("")+'</div>'+
+  '<h3 class="sec">ক্যাটাগরি অনুযায়ী খুঁজুন</h3><div class="grid">'+CATS.slice(1).map(function(c){return '<button class="cat" data-hcat="'+c+'">'+c+'</button>'}).join("")+'</div>'+
+  '<h3 class="sec">সর্বশেষ চাকরি</h3>'+(l.length?l.map(card).join(""):'<div class="empty">এখনো কোনো চাকরি পোস্ট হয়নি।</div>')+
+  '<button class="fab" data-tab="jobs">সব চাকরি ›</button>';
+}
+function viewPhone(){
+  var sent=!!st.conf;
+  return '<h2 class="pt" style="margin-top:14px">মোবাইল নম্বর যাচাই করুন</h2><p class="co">'+(sent?esc(st.phone)+' নম্বরে ৬ সংখ্যার কোড পাঠানো হয়েছে।':'চালিয়ে যেতে আপনার মোবাইল নম্বরে একটি কোড পাঠানো হবে।')+'</p>'+
+  (sent?'<label for="otp">যাচাইকরণ কোড</label><input id="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><div class="err" id="perr2"></div><div style="margin-top:14px"><button class="btn" id="verify">যাচাই করুন</button></div><div style="margin-top:10px"><button class="btn alt" id="chg">নম্বর বদলান</button></div>':
+  '<label for="ph">মোবাইল নম্বর</label><input id="ph" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel"><div class="err" id="perr2"></div><div style="margin-top:14px"><button class="btn" id="sendotp">কোড পাঠান</button></div>')+
+  '<div style="margin-top:10px"><button class="btn alt" id="logout">লগআউট</button></div>';
+}
+function viewAuth(){
+  var su=st.mode==="signup",setup=CFG.apiKey.indexOf("YOUR")===0;
+  return '<h2 class="pt">'+(su?"নতুন অ্যাকাউন্ট":"লগইন")+'</h2>'+
+  (setup?'<p class="err">Firebase কনফিগ বসানো হয়নি। ফাইলের শুরুতে CFG-তে নিজের মান দিন।</p>':'')+
+  (su?'<label for="nm">আপনার নাম</label><input id="nm" autocomplete="name"><label for="rl">আপনি কে?</label><select id="rl"><option value="seeker">চাকরি খুঁজছি</option><option value="employer">লোক নিয়োগ দিচ্ছি</option></select>':'')+
+  '<label for="em">ইমেইল</label><input id="em" type="email" autocomplete="email">'+
+  '<label for="pw">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)</label><input id="pw" type="password" autocomplete="'+(su?"new-password":"current-password")+'">'+
+  '<div class="err" id="aerr2">'+esc(st.err)+'</div><div style="margin-top:14px"><button class="btn" id="doauth">'+(su?"অ্যাকাউন্ট খুলুন":"লগইন করুন")+'</button></div>'+
+  '<div style="margin-top:10px"><button class="btn alt" id="swap">'+(su?"আগে থেকেই অ্যাকাউন্ট আছে":"নতুন অ্যাকাউন্ট খুলুন")+'</button></div><div style="margin-top:10px"><button class="btn alt" id="tohome">হোম পেজে ফিরুন</button></div>';
+}
+function viewJobs(){
+  var q=st.q.trim().toLowerCase();
+  var list=st.jobs.filter(function(j){return (st.cat==="সব"||j.cat===st.cat)&&(st.div==="সব"||j.div===st.div)&&(st.dist==="সব"||j.dist===st.dist||j.city===st.dist)&&(!q||(j.t+" "+j.c).toLowerCase().indexOf(q)>-1)});
+  var h='<div class="search"><input id="q" type="search" placeholder="পদ বা কোম্পানির নাম লিখুন" value="'+esc(st.q)+'" aria-label="চাকরি খুঁজুন"></div>'+
+  '<div class="filters"><select id="fdiv" aria-label="বিভাগ">'+opts(Object.keys(LOC),st.div,"সব বিভাগ")+'</select><select id="fdist" aria-label="জেলা">'+opts(st.div==="সব"?ALLD:LOC[st.div],st.dist,"সব জেলা")+'</select></div>'+
+  '<div class="chips">'+CATS.map(function(c){return '<button class="chip" data-cat="'+c+'" aria-pressed="'+(c===st.cat)+'">'+c+'</button>'}).join("")+'</div>'+
+  '<div class="count">'+list.length+'টি চাকরি পাওয়া গেছে</div>';
+  return h+(list.length?list.map(card).join(""):'<div class="empty">কোনো চাকরি মেলেনি। নিয়োগকর্তারা পোস্ট করলে এখানে দেখা যাবে।</div>');
+}
+function viewSaved(){
+  var l=st.jobs.filter(function(j){return st.saved.indexOf(j.id)>-1});
+  return '<h2 class="pt">সেভ করা চাকরি</h2>'+(l.length?l.map(card).join(""):'<div class="empty">এখনো কিছু সেভ করেননি। চাকরির পাশে ☆ চাপুন।</div>');
+}
+function viewApplied(){
+  if(isEmp()){
+    var h='<h2 class="pt">আবেদনকারী</h2>';
+    if(!st.apps.length)return h+'<div class="empty">এখনো কেউ আবেদন করেননি।</div>';
+    return h+st.apps.map(function(a){return '<article class="job"><h3>'+esc(a.name)+'</h3><div class="co">আবেদন: '+esc(a.title)+'</div><div class="meta"><a href="tel:'+esc(a.phone)+'">'+esc(a.phone)+'</a><span>'+dt(a)+'</span></div>'+(a.note?'<p>'+esc(a.note)+'</p>':'')+'</article>'}).join("");
+  }
+  var h2='<h2 class="pt">আমার আবেদন</h2>';
+  if(!st.apps.length)return h2+'<div class="empty">এখনো কোনো আবেদন করেননি। চাকরি খুঁজে আবেদন করুন।</div>';
+  return h2+st.apps.map(function(a){return '<article class="job" data-open="'+esc(a.jobId)+'"><h3>'+esc(a.title)+'</h3><div class="co">'+esc(a.company)+'</div><div class="meta"><span class="badge">জমা হয়েছে</span><span>'+dt(a)+'</span></div></article>'}).join("");
+}
+function viewPost(){
+  return '<h2 class="pt">চাকরি পোস্ট করুন</h2><p class="co">পোস্ট করলেই সব চাকরিপ্রার্থী দেখতে পাবেন।</p>'+
+  '<label for="pt">পদের নাম</label><input id="pt">'+
+  '<label for="pc">কোম্পানির নাম</label><input id="pc">'+
+  '<label for="pcat">ক্যাটাগরি</label><select id="pcat">'+CATS.slice(1).map(function(c){return '<option>'+c+'</option>'}).join("")+'</select>'+
+  '<label for="pdiv">বিভাগ</label><select id="pdiv">'+opts(Object.keys(LOC),"ঢাকা")+'</select>'+
+  '<label for="pdist">জেলা</label><select id="pdist">'+opts(LOC["ঢাকা"],"ঢাকা")+'</select>'+
+  '<label for="pup">উপজেলা / থানা / সিটি কর্পোরেশন</label><select id="pup">'+opts(UP["ঢাকা"].concat(["অন্যান্য"]),UP["ঢাকা"][0])+'</select>'+
+  '<input id="pupx" placeholder="এলাকার নাম লিখুন" style="display:none;margin-top:8px">'+
+  '<label for="ps">বেতন (যেমন ২০,০০০ – ৩০,০০০)</label><input id="ps">'+
+  '<label for="pd">কাজের বিবরণ</label><textarea id="pd"></textarea>'+
+  '<div class="err" id="perr"></div><div style="margin-top:14px"><button class="btn" id="dopost">চাকরি পোস্ট করুন</button></div>';
+}
+function viewMe(){
+  return '<h2 class="pt">আমার অ্যাকাউন্ট</h2><p>'+esc(st.profile.name)+'</p><p class="co">'+esc(st.user.email)+' – '+(isEmp()?"নিয়োগকর্তা":"চাকরিপ্রার্থী")+'</p><div style="margin-top:14px"><button class="btn alt" id="logout">লগআউট</button></div>';
+}
+function render(){var hx=document.getElementById("hextra"),av=document.getElementById("av");
+  if(av){av.hidden=!st.user;if(st.user)av.textContent=((st.profile&&st.profile.name)||"?").trim().charAt(0).toUpperCase()}
+  if(hx){var old=document.getElementById("hq"),ov=old?old.value:"",of=old&&document.activeElement===old,sv=nStats();
+    hx.innerHTML=(st.user&&st.tab==="home")?'<div class="hsearch"><input id="hq" type="search" placeholder="চাকরি খুঁজুন" aria-label="চাকরি খুঁজুন"><button id="hsearch" aria-label="খুঁজুন">🔍</button></div><div class="stats"><div><b>'+bn(sv[0])+'</b><span>চালু চাকরি</span></div><div><b>'+bn(sv[1])+'</b><span>কোম্পানি</span></div><div><b>'+bn(sv[2])+'</b><span>নতুন চাকরি</span></div></div>':'<p class="tag">দেশের চাকরি, এক জায়গায়</p>';
+    var nq=document.getElementById("hq");if(nq&&ov){nq.value=ov;if(of)nq.focus()}}
+  var v=document.getElementById("view"),nav=document.querySelector("nav");
+  if(st.user&&st.needPhone){v.innerHTML=viewPhone();nav.style.display="none";return}
+  if(!st.user){v.innerHTML=st.landing?viewLanding():viewAuth();nav.style.display="none";return}
+  nav.style.display="";
+  v.innerHTML=st.tab==="home"?viewHome():st.tab==="jobs"?viewJobs():st.tab==="saved"?viewSaved():st.tab==="applied"?viewApplied():st.tab==="post"?viewPost():viewMe();
+  var H=["home","🏠","হোম"];var T=isEmp()?[H,["jobs","🔍","চাকরি"],["post","＋","পোস্ট"],["applied","👥","আবেদনকারী"],["me","👤","আমি"]]:[H,["jobs","🔍","চাকরি"],["saved","★","সেভ"],["applied","✓","আবেদন"],["me","👤","আমি"]];
+  document.getElementById("tabs").innerHTML=T.map(function(t){return '<button data-tab="'+t[0]+'"'+(st.tab===t[0]?' aria-current="page"':'')+'><b aria-hidden="true">'+t[1]+'</b>'+t[2]+'</button>'}).join("");
+  var q=document.getElementById("q");
+  if(q&&st.keepFocus){q.focus();q.setSelectionRange(q.value.length,q.value.length);st.keepFocus=false}
+}
+function openJob(id){
+  var j=byId(id);if(!j)return;st.sel=j;
+  var ap=st.apps.some(function(a){return a.jobId===id});
+  var s=document.getElementById("sheet");
+  var form=isEmp()?'<p class="co">আবেদন করতে চাকরিপ্রার্থীর অ্যাকাউন্ট লাগবে।</p>':ap?'<p><span class="badge">আপনি আবেদন করেছেন</span></p>':
+  '<h4>আবেদন করুন</h4><label for="an">আপনার নাম</label><input id="an" autocomplete="name" value="'+esc(st.profile.name)+'">'+
+  '<label for="am">মোবাইল নম্বর</label><input id="am" inputmode="tel" placeholder="01XXXXXXXXX" autocomplete="tel" value="'+esc(st.user.phoneNumber||"")+'">'+
+  '<label for="al">সংক্ষিপ্ত পরিচয়</label><textarea id="al"></textarea><div class="err" id="aerr"></div>'+
+  '<div style="margin-top:14px"><button class="btn" id="doapply">আবেদন জমা দিন</button></div>';
+  s.innerHTML='<h2>'+esc(j.t)+'</h2><div class="co">'+esc(j.c)+' – '+esc(locStr(j))+'</div>'+
+  '<div class="meta"><span class="sal">'+esc(j.sal)+'</span><span>'+esc(j.type)+'</span></div>'+
+  '<h4>কাজের বিবরণ</h4><p>'+esc(j.d)+'</p>'+form+'<div style="margin-top:10px"><button class="btn alt" id="close">বন্ধ করুন</button></div>';
+  document.getElementById("bg").classList.add("on");
+}
+function closeSheet(){document.getElementById("bg").classList.remove("on")}
+function showErr(id,m){var e=document.getElementById(id);if(e)e.textContent=m}
+
+document.addEventListener("click",function(e){
+  var t=e.target;
+  var sv=t.closest("[data-save]");
+  if(sv){e.stopPropagation();var id=sv.getAttribute("data-save"),i=st.saved.indexOf(id);if(i>-1)st.saved.splice(i,1);else{st.saved.push(id);toast("চাকরি সেভ হয়েছে")}keep();render();return}
+  var o=t.closest("[data-open]");if(o){openJob(o.getAttribute("data-open"));return}
+  var tb=t.closest("[data-tab]");if(tb){st.tab=tb.getAttribute("data-tab");render();window.scrollTo(0,0);return}
+  var go=t.closest("[data-go]");if(go){st.landing=false;st.mode=go.getAttribute("data-go");st.err="";render();return}
+  var hc=t.closest("[data-hcat]");if(hc){st.cat=hc.getAttribute("data-hcat");st.q="";st.tab="jobs";render();window.scrollTo(0,0);return}
+  if(t.id==="hsearch"){st.q=document.getElementById("hq").value;st.cat="সব";st.tab="jobs";render();window.scrollTo(0,0);return}
+  if(t.id==="tohome"){st.landing=true;render();return}
+  var ch=t.closest("[data-cat]");if(ch){st.cat=ch.getAttribute("data-cat");render();return}
+  if(t.id==="close"||t.id==="bg"){closeSheet();return}
+  if(t.id==="swap"){st.mode=st.mode==="login"?"signup":"login";st.err="";render();return}
+  if(t.id==="logout"){signOut(auth);return}
+  if(t.id==="chg"){st.conf=null;render();return}
+  if(t.id==="sendotp"){
+    var ph=document.getElementById("ph").value.trim();
+    if(!/^(\+?88)?01[3-9]\d{8}$/.test(ph)){showErr("perr2","সঠিক মোবাইল নম্বর দিন, যেমন 01712345678।");return}
+    var full="+88"+ph.replace(/^\+?88/,"");t.disabled=true;
+    try{if(!window.rv)window.rv=new RecaptchaVerifier(auth,"rc",{size:"invisible"})}catch(x){}
+    linkWithPhoneNumber(auth.currentUser,full,window.rv).then(function(c){st.conf=c;st.phone=full;render()})
+    .catch(function(x){t.disabled=false;try{window.rv.clear()}catch(e){}window.rv=null;showErr("perr2",PERR[x.code]||"কোড পাঠানো যায়নি। আবার চেষ্টা করুন।")});
+    return}
+  if(t.id==="verify"){
+    var code=document.getElementById("otp").value.trim();
+    if(code.length!==6){showErr("perr2","৬ সংখ্যার কোডটি লিখুন।");return}
+    t.disabled=true;
+    st.conf.confirm(code).then(async function(){
+      await auth.currentUser.reload();st.user=auth.currentUser;
+      await setDoc(doc(db,"users",st.user.uid),{phone:st.user.phoneNumber},{merge:true});
+      st.needPhone=false;st.conf=null;st.tab="home";subscribe();render();toast("মোবাইল নম্বর যাচাই হয়েছে");
+    }).catch(function(x){t.disabled=false;showErr("perr2",PERR[x.code]||"যাচাই করা যায়নি। আবার চেষ্টা করুন।")});
+    return}
+  if(t.id==="doauth"){
+    var em=document.getElementById("em").value.trim(),pw=document.getElementById("pw").value,su=st.mode==="signup";
+    if(su){var nm=document.getElementById("nm").value.trim();if(!nm){showErr("aerr2","আপনার নাম লিখুন।");return}st.pending={name:nm,role:document.getElementById("rl").value}}
+    t.disabled=true;
+    (su?createUserWithEmailAndPassword(auth,em,pw):signInWithEmailAndPassword(auth,em,pw)).catch(function(x){t.disabled=false;showErr("aerr2",AERR[x.code]||"কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।")});
+    return}
+  if(t.id==="doapply"){
+    var n=document.getElementById("an").value.trim(),m=document.getElementById("am").value.trim(),j=st.sel;
+    if(!n){showErr("aerr","আপনার নাম লিখুন।");return}
+    if(!/^(\+?88)?01[3-9]\d{8}$/.test(m)){showErr("aerr","সঠিক মোবাইল নম্বর দিন, যেমন 01712345678।");return}
+    t.disabled=true;
+    addDoc(collection(db,"applications"),{jobId:j.id,title:j.t,company:j.c,employerId:j.uid,userId:st.user.uid,name:n,phone:m,note:document.getElementById("al").value.trim(),createdAt:serverTimestamp()})
+    .then(function(){closeSheet();toast("আবেদন জমা হয়েছে")}).catch(function(){t.disabled=false;showErr("aerr","আবেদন জমা হয়নি। আবার চেষ্টা করুন।")});
+    return}
+  if(t.id==="dopost"){
+    var a=document.getElementById("pt").value.trim(),b=document.getElementById("pc").value.trim(),d=document.getElementById("pd").value.trim();
+    if(!a||!b||!d){showErr("perr","পদের নাম, কোম্পানি ও বিবরণ পূরণ করুন।");return}
+    var s=document.getElementById("ps").value.trim();t.disabled=true;
+    addDoc(collection(db,"jobs"),{t:a,c:b,cat:document.getElementById("pcat").value,div:document.getElementById("pdiv").value,dist:document.getElementById("pdist").value,up:getUp(),city:document.getElementById("pdist").value,sal:s?"৳ "+s:"আলোচনা সাপেক্ষে",type:"ফুল টাইম",d:d,uid:st.user.uid,createdAt:serverTimestamp()})
+    .then(function(){st.tab="jobs";st.cat="সব";st.div="সব";st.dist="সব";st.q="";render();toast("চাকরি পোস্ট হয়েছে");window.scrollTo(0,0)})
+    .catch(function(){t.disabled=false;showErr("perr","পোস্ট করা যায়নি। আবার চেষ্টা করুন।")});
+  }
+});
+document.addEventListener("input",function(e){if(e.target.id==="q"){st.q=e.target.value;st.keepFocus=true;render()}});
+document.addEventListener("change",function(e){var id=e.target.id,v=e.target.value;
+  if(id==="fdiv"){st.div=v;st.dist="সব";render()}
+  else if(id==="fdist"){st.dist=v;render()}
+  else if(id==="pdiv"){document.getElementById("pdist").innerHTML=opts(LOC[v]);syncUp()}
+  else if(id==="pdist"){syncUp()}
+  else if(id==="pup"){document.getElementById("pupx").style.display=v==="অন্যান্য"?"":"none"}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet();if(e.key==="Enter"&&e.target.id==="hq"){document.getElementById("hsearch").click()}});
+render();
+</script>
+</body>
+</html>
